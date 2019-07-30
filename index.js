@@ -1,7 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 
-var amqlib = require('./rabbitMQ.js');
+var amqlib = require('./rabbit.js');
 var app = express();
 app.use(bodyParser.json());
 

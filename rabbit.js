@@ -3,7 +3,7 @@ var amqplib = require('amqplib/callback_api.js');
 var model = require('./model/model');
 var router = express.Router();
 
-router.post('/', (req, res) => {
+// router.post('/', (req, res) => {
     console.log('POST INSIDE');
     amqplib.connect('amqp://localhost', function (error0, connection) {
         if (error0) {
@@ -20,31 +20,45 @@ router.post('/', (req, res) => {
             channel.assertQueue(queue, {
                 durable: false
             });
+            
             channel.sendToQueue(queue, Buffer.from(msg));
-            Model = new model({
-                first: msg + 'test',
+            channel.consume(queue,function(msg){
+                console.log('Consume inside');
+                console.log(msg.content.toString());
+                
+                // var MessageVariable=JSON.parse(msg.content.toString());
+                
+                // console.log(MessageVariable);
+                // model.first=MessageVariable.first;
+                console.log('---------Model');
+               
             });
-            //MongoDB Saving Starting
-            Model.save((err, data) => {
-                if (!err) {
-                    res.send(msg.toString());
-                    console.log('RES DATA: ' + res.send(data));
-                    res.end();
-                } else {
-                    console.log('____--------');
-                    console.log('Error: ' + JSON.stringify(err, undefined, 2));
-                }
-            });
+            // Model = new model({
+            //     first: msg + 'test',
+            // });
+            // //MongoDB Saving Starting
+            // Model.save((err, data) => {
+            //     if (!err) {
+            //         res.send(msg.toString());
+            //         console.log('RES DATA: ' + res.send(data));
+            //         res.end();
+            //     } else {
+            //         console.log('____--------');
+            //         console.log('Error: ' + JSON.stringify(err, undefined, 2));
+            //     }
+            // });
             //MongoDb Saving Ending
             console.log(" Send The Message:", msg);
         });
+    
+        
         setTimeout(function () {
             connection.close();
             process.exit(0);
         }, 500);
-
+       
     });
 
 
-});
-module.exports = router;
+// });
+module.exports = amqplib;
