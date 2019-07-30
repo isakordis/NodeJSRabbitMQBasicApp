@@ -1,10 +1,12 @@
-var express = require('express');
 var amqplib = require('amqplib/callback_api.js');
-var model = require('./model/model');
+var Model = require('./model/model');
+var express = require('express');
 var router = express.Router();
 
-// router.post('/', (req, res) => {
-    console.log('POST INSIDE');
+router.post('/', (req, res) => {
+
+
+
     amqplib.connect('amqp://localhost', function (error0, connection) {
         if (error0) {
             throw error0;
@@ -15,52 +17,46 @@ var router = express.Router();
             }
 
             var queue = 'This is Test';
-            var msg = 'new Message!';
+            var msg = 'new Message! testing  : '+ Math.random();
 
             channel.assertQueue(queue, {
                 durable: false
             });
-            
+
             channel.sendToQueue(queue, Buffer.from(msg));
-            channel.consume(queue,function(msg){
-                console.log('Consume inside');
-                console.log(msg.content.toString());
-                
-                // var MessageVariable=JSON.parse(msg.content.toString());
-                
-                // console.log(MessageVariable);
-                // model.first=MessageVariable.first;
-                console.log('---------Model');
-               
-            },{
-                noAck:true
-            });
-            // Model = new model({
-            //     first: msg + 'test',
-            // });
-            // //MongoDB Saving Starting
-            // Model.save((err, data) => {
-            //     if (!err) {
-            //         res.send(msg.toString());
-            //         console.log('RES DATA: ' + res.send(data));
-            //         res.end();
-            //     } else {
-            //         console.log('____--------');
-            //         console.log('Error: ' + JSON.stringify(err, undefined, 2));
-            //     }
-            // });
-            //MongoDb Saving Ending
-            console.log(" Send The Message:", msg);
+
+            channel.consume(queue, function (msg) {
+                console.log('Consumer Inside');
+                var mymm = msg.content.toString();
+                console.log("MyMessage:" + mymm);
+                var model = new Model({
+
+                    modelMessage: mymm,
+
+                });
+                model.save((err, mymm) => {
+                    if (!err) {
+                        console.log('Save inside');
+                        mymm = msg.content.toString();
+                        console.log('MYMM:' + mymm);
+                        res.send(mymm);
+                    } else {
+                        console.log('Error:' + JSON.stringify(err, undefined, 2));
+                    }
+                });
+            }, {
+                    noAck: true
+                });
+
+            
+
         });
-    
-        
         setTimeout(function () {
             connection.close();
             process.exit(0);
         }, 500);
-       
+
     });
 
-
-// });
-module.exports = amqplib;
+});
+module.exports = router;

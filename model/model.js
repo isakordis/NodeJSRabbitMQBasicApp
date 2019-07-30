@@ -1,8 +1,8 @@
 var mongoose=require('mongoose');
 
-
-var model=mongoose.model('myModel',{
-first:String,
-
+var users=mongoose.model('users',{
+   
+    modelMessage:String,    
 });
-module.exports=model;
+
+module.exports=users;
