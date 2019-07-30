@@ -32,6 +32,8 @@ var router = express.Router();
                 // model.first=MessageVariable.first;
                 console.log('---------Model');
                
+            },{
+                noAck:true
             });
             // Model = new model({
             //     first: msg + 'test',
