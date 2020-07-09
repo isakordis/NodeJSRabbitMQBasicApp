@@ -3,4 +3,4 @@
 
 RabbitMQ Local Adres: http://localhost:15672
 
-run from project index.js
+run from project app.js
